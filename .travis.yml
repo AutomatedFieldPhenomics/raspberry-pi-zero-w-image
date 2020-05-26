@@ -16,8 +16,8 @@ addons:
     - zip
 
 script:
-- ./create-image
-- travis_wait 20 xz -z -k -T0 raspberry-pi-zero-w.img
+- sudo bash ./create-image
+- travis_wait 20 xz -z -k -T0 -Q raspberry-pi-zero-w.img
 - zip raspberry-pi-zero-w.img.zip raspberry-pi-zero-w.img
 
 deploy:
