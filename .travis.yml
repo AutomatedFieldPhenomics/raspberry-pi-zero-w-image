@@ -15,14 +15,10 @@ addons:
     - xz-utils
     - zip
 
-jobs:
-  include:
-  - stage: build
-    script: sudo bash ./create-image
-  - stage: compress
-    script: travis_wait 20 xz -z -k -T0 raspberry-pi-zero-w.img
-  - # ... 
-    script: zip raspberry-pi-zero-w.img.zip raspberry-pi-zero-w.img
+script:
+- sudo bash ./create-image
+- travis_wait 20 xz -z -k -T0 raspberry-pi-zero-w.img
+- zip raspberry-pi-zero-w.img.zip raspberry-pi-zero-w.img
 
 deploy:
   provider: releases
