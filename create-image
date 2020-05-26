@@ -88,8 +88,8 @@ cp /etc/resolv.conf ${mount}/etc/resolv.conf
 
 # Run setup script inside the chroot
 for script in scripts.d/* ; do
-    install -Dm755 "${script}" "${mount}/tmp/${script}"
-    chroot "${mount}" "/tmp/${script}"
+    install -Dm755 "${script}" "${mount}/tmp/`basename ${script}`"
+    chroot "${mount}" "/tmp/`basename ${script}`"
     rm -f "${mount}/tmp/${script}"
 done
 
