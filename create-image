@@ -33,6 +33,7 @@ mv -f *.img "${rpi_img}"
 # general cleanup
 unmount() {
     if [[ ! -f "${mount}/.gitignore" ]]; then
+        umount "${mount}/dev/pts" || true
         umount "${mount}/dev"  || true
         umount "${mount}/sys"  || true
         umount "${mount}/proc" || true
@@ -71,6 +72,7 @@ mount "${bootdev}" "${mount}/boot"
 mount -t proc  none ${mount}/proc
 mount -t sysfs none ${mount}/sys
 mount -o bind  /dev ${mount}/dev
+mount -t devpts none ${mount}/dev/pts
 
 # Copy distribution files
 for dir in boot etc home ; do
