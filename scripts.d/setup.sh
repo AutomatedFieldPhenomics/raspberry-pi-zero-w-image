@@ -6,7 +6,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
 # Update system
-#apt update && apt -y -q dist-upgrade
+apt update && apt -y -q dist-upgrade
 
 # Install any packages we want
 apt install -q -y bash-completion sudo avahi-daemon wpasupplicant
