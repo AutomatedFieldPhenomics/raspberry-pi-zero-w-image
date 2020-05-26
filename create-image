@@ -108,5 +108,3 @@ echo $e2fs_bsize $e2fs_bcount
 #newsize=e2fs_bsize*e2fs_bcount
 #parted --script "${loopdev}" resizepart 2 e2fs_bsize*e2fs_bcount
 #truncate -s ${newsize} "${rpi_img}"
-zip "${rpi_zip}" "${rpi_img}"
-rm -f "${rpi_img}"
