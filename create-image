@@ -76,7 +76,7 @@ mount -t devpts none ${mount}/dev/pts
 
 # Copy distribution files
 for dir in boot etc home ; do
-    cp -r ${dir} ${mount}/${dir}
+    cp -f -r ${dir} ${mount}/${dir}
 done
 
 # Apply patch files
@@ -85,14 +85,14 @@ for patch in patches.d/* ; do
 done
 
 # Copy host resolv.conf
-mv ${mount}/etc/resolv.conf ${mount}/etc/resolv.conf.bak
-cp /etc/resolv.conf ${mount}/etc/resolv.conf
+mv -f ${mount}/etc/resolv.conf ${mount}/etc/resolv.conf.bak
+cp -f /etc/resolv.conf ${mount}/etc/resolv.conf
 
 # Disable /etc/ld.so.preload
 mv -f ${mount}/etc/ld.so.preload ${mount}/etc/ld.so.preload.bak
 
 # Copy qemu
-cp /usr/bin/qemu-arm-static ${mount}/usr/bin/
+cp -f /usr/bin/qemu-arm-static ${mount}/usr/bin/
 
 # Run setup script inside the chroot
 for script in scripts.d/* ; do
@@ -102,13 +102,13 @@ for script in scripts.d/* ; do
 done
 
 # Copy original resolv.conf
-mv ${mount}/etc/resolv.conf.bak ${mount}/etc/resolv.conf
+mv -f ${mount}/etc/resolv.conf.bak ${mount}/etc/resolv.conf
 
 # Enable /etc/ld.so.preload
 mv -f ${mount}/etc/ld.so.preload.bak ${mount}/etc/ld.so.preload
 
 # Remove qemu
-rm ${mount}/usr/bin/qemu-arm-static
+rm -f ${mount}/usr/bin/qemu-arm-static
 
 # General cleanup
 unmount
