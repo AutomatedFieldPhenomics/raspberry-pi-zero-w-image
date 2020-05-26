@@ -6,5 +6,5 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
 # Update system
-apt-get update && apt-get -y -q dist-upgrade
+apt-get update && apt-get -y -q dist-upgrade && apt-get clean
 
