@@ -17,7 +17,7 @@ fi
 # Some useful constants
 mount="mnt" # Local directory to mount the image (automatically created/delete as needed)
 rpi_zip="raspberry-pi-zero-w.zip"
-rpi_url="https://downloads.raspberrypi.org/raspbian_lite_latest"
+rpi_url="https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2020-02-14/2020-02-13-raspbian-buster-lite.zip"
 
 # Download raspbian zip only if we have not already done so
 rpi_orig_zip="${rpi_zip/.zip/.orig.zip}"
