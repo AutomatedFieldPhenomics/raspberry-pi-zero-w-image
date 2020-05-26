@@ -1,0 +1,19 @@
+dist: trusty
+
+sudo: required
+
+addons:
+  apt:
+    packages:
+      - qemu
+      - qemu-user-static
+      - binfmt-support
+      - parted
+      - wget
+      - dosfstools
+      - zip
+
+script:
+  - sudo bash ./create-image
+  - xz -z raspberry-pi-zero-w.img -c > raspberr-pi-zero-w.img.xz
+  - zip raspberry-pi-zero-w.img.zip raspberry-pi-zero-w.img

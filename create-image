@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# Setup script error handling see https://disconnected.systems/blog/another-bash-strict-mode for details
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+IFS=$'\n\t'
+
+# Allow empty sets
+shopt -s nullglob
+
+# Ensure we are root
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root" 1>&2
+    exit 1
+fi
+
+# Some useful constants
+mount="mnt" # Local directory to mount the image (automatically created/delete as needed)
+rpi_zip="raspbian_lite_latest.zip"
+rpi_url="https://downloads.raspberrypi.org/raspbian_lite_latest"
+
+# Download raspbian zip only if we have not already done so
+rpi_orig_zip="${rpi_zip/.zip/.orig.zip}"
+[ ! -f "${rpi_orig_zip}" ] && wget "${rpi_url}" -O "${rpi_orig_zip}"
+
+# Unzip the raspbian zip
+unzip "${rpi_orig_zip}"
+rpi_img="${rpi_zip/zip/img}"
+rm -f "${rpi_img}"
+mv -f *.img "${rpi_img}"
+
+# Tasks to run when the shell exits for any reason, unmount the image and
+# general cleanup
+unmount() {
+    if [[ ! -f "${mount}/.gitignore" ]]; then
+        umount "${mount}/dev"  || true
+        umount "${mount}/sys"  || true
+        umount "${mount}/proc" || true
+        umount "${mount}/boot" || true
+        umount "${mount}" || true
+    fi
+}
+detach() {
+    [ -n "${loopdev}" ] && losetup --detach "${loopdev}" || true
+}
+cleanup() {
+    unmount
+    detach
+}
+trap cleanup EXIT
+
+# Create, partition and format the image
+loopdev=$(losetup --find --show --partscan "${rpi_img}")
+parted --script "${loopdev}" print
+bootdev=$(ls "${loopdev}"*1)
+rootdev=$(ls "${loopdev}"*2)
+
+# Expand image to 4 GiB
+truncate -s 4G "${rpi_img}"
+losetup -c "${loopdev}"
+parted --script "${loopdev}" resizepart 2 100%
+resize2fs "${rootdev}"
+
+# Mount the image
+[ ! -d "${mount}" ] && mkdir "${mount}"
+mount "${rootdev}" "${mount}"
+[ ! -d "${mount}/boot" ] && mkdir "${mount}/boot"
+mount "${bootdev}" "${mount}/boot"
+
+# Prep the chroot
+mount -t proc  none ${mount}/proc
+mount -t sysfs none ${mount}/sys
+mount -o bind  /dev ${mount}/dev
+
+# Copy distribution files
+for dir in boot etc home ; do
+    cp -r ${dir} ${mount}/${dir}
+done
+
+# Apply patch files
+for patch in patches.d/* ; do
+    patch -p0 -d "${mount}" < "${patch}"
+done
+
+# Copy host resolv.conf
+mv ${mount}/etc/resolv.conf ${mount}/etc/resolv.conf.bak
+cp /etc/resolv.conf ${mount}/etc/resolv.conf
+
+# Run setup script inside the chroot
+for script in scripts.d/* ; do
+    install -Dm755 "${script}" "${mount}/tmp/${script}"
+    chroot "${mount}" "/tmp/${script}"
+    rm -f "${mount}/tmp/${script}"
+done
+
+# Copy original resolv.conf
+mv ${mount}/etc/resolv.conf.bak ${mount}/etc/resolv.conf
+
+# General cleanup
+unmount
+
+# Check and shrink image
+e2fsck -f "${rootdev}"
+resize2fs -M "${rootdev}"
+e2fs_bsize=`dumpe2fs -h "${rootdev}" | grep Block\ size 2> /dev/null`
+e2fs_bcount=`dumpe2fs -h "${rootdev}" | grep Block\ count 2> /dev/null`
+echo $e2fs_bsize $e2fs_bcount
+#newsize=e2fs_bsize*e2fs_bcount
+#parted --script "${loopdev}" resizepart 2 e2fs_bsize*e2fs_bcount
+#truncate -s ${newsize} "${rpi_img}"
+zip "${rpi_zip}" "${rpi_img}"
+rm -f "${rpi_img}"
