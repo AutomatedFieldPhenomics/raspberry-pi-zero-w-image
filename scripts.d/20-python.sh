@@ -9,5 +9,5 @@ IFS=$'\n\t'
 apt-get install -q -y python3-pip
 
 # Python packages
-pip3 install plantcv
+pip3 install picamera
 
