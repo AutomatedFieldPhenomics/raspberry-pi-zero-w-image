@@ -118,7 +118,9 @@ e2fsck -p -f "${rootdev}"
 resize2fs -M "${rootdev}"
 e2fs_bsize=`dumpe2fs -h "${rootdev}" | grep Block\ size 2> /dev/null`
 e2fs_bcount=`dumpe2fs -h "${rootdev}" | grep Block\ count 2> /dev/null`
-echo $e2fs_bsize $e2fs_bcount
+echo $e2fs_bsize
+echo $e2fs_bcount
+# TODO shrink to minimum size, rely on raspi-config to auto expand on first boot
 #newsize=e2fs_bsize*e2fs_bcount
 #parted --script "${loopdev}" resizepart 2 e2fs_bsize*e2fs_bcount
 #truncate -s ${newsize} "${rpi_img}"
