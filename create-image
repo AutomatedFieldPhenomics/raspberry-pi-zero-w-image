@@ -21,7 +21,7 @@ rpi_url="https://downloads.raspberrypi.org/raspbian_lite_latest"
 
 # Download raspbian zip only if we have not already done so
 rpi_orig_zip="${rpi_zip/.zip/.orig.zip}"
-[ ! -f "${rpi_orig_zip}" ] && wget "${rpi_url}" -O "${rpi_orig_zip}"
+[ ! -f "${rpi_orig_zip}" ] && wget -q "${rpi_url}" -O "${rpi_orig_zip}"
 
 # Unzip the raspbian zip
 unzip "${rpi_orig_zip}"
