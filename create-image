@@ -16,7 +16,7 @@ fi
 
 # Some useful constants
 mount="mnt" # Local directory to mount the image (automatically created/delete as needed)
-rpi_zip="raspbian_lite_latest.zip"
+rpi_zip="raspberry-pi-zero-w.zip"
 rpi_url="https://downloads.raspberrypi.org/raspbian_lite_latest"
 
 # Download raspbian zip only if we have not already done so
