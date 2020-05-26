@@ -86,6 +86,9 @@ done
 mv ${mount}/etc/resolv.conf ${mount}/etc/resolv.conf.bak
 cp /etc/resolv.conf ${mount}/etc/resolv.conf
 
+# Disable /etc/ld.so.preload
+mv -f ${mount}/etc/ld.so.preload ${mount}/etc/ld.so.preload.bak
+
 # Copy qemu
 cp /usr/bin/qemu-arm-static ${mount}/usr/bin/
 
@@ -98,6 +101,12 @@ done
 
 # Copy original resolv.conf
 mv ${mount}/etc/resolv.conf.bak ${mount}/etc/resolv.conf
+
+# Enable /etc/ld.so.preload
+mv -f ${mount}/etc/ld.so.preload.bak ${mount}/etc/ld.so.preload
+
+# Remove qemu
+rm ${mount}/usr/bin/qemu-arm-static
 
 # General cleanup
 unmount
