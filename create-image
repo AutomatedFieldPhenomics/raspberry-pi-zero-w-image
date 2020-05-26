@@ -86,6 +86,9 @@ done
 mv ${mount}/etc/resolv.conf ${mount}/etc/resolv.conf.bak
 cp /etc/resolv.conf ${mount}/etc/resolv.conf
 
+# Copy qemu
+cp /usr/bin/qemu-arm-static ${mount}/usr/bin/
+
 # Run setup script inside the chroot
 for script in scripts.d/* ; do
     install -Dm755 "${script}" "${mount}/tmp/`basename ${script}`"

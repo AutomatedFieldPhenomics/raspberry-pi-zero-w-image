@@ -27,6 +27,7 @@ deploy:
   file:
   - raspberry-pi-zero-w.img.xz
   - raspberry-pi-zero-w.img.zip
+  skip_cleanup: true
   on:
     repo: AutomatedFieldPhenomics/raspberry-pi-zero-w-image
-  skip_cleanup: 'true'
+    tags: true
