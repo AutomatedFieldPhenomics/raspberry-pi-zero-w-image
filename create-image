@@ -103,7 +103,7 @@ mv ${mount}/etc/resolv.conf.bak ${mount}/etc/resolv.conf
 unmount
 
 # Check and shrink image
-e2fsck -f "${rootdev}"
+e2fsck -p -f "${rootdev}"
 resize2fs -M "${rootdev}"
 e2fs_bsize=`dumpe2fs -h "${rootdev}" | grep Block\ size 2> /dev/null`
 e2fs_bcount=`dumpe2fs -h "${rootdev}" | grep Block\ count 2> /dev/null`
