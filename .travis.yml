@@ -12,7 +12,7 @@ addons:
     - binfmt-support
     - parted
     - wget
-    - dosfstools
+    - xz-utils
     - zip
 
 script:
