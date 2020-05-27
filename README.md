@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/AutomatedFieldPhenomics/raspberry-pi-zero-w-image.svg?branch=master)](https://travis-ci.org/AutomatedFieldPhenomics/raspberry-pi-zero-w-image)
 
+Note: These images are using the Canadian WLAN regulatory domain.
+
 ## Download and Uncompress
 
 The boot images are compressed as a zip or xz file.
