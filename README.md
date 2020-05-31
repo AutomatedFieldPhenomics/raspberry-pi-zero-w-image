@@ -4,13 +4,11 @@
 
 Note: These images are using the Canadian WLAN regulatory domain.
 
-## Download and Uncompress
+## Download
 
 The boot images are compressed as a zip or xz file.
 -  [raspberry-pi-zero-w.img.zip](https://github.com/AutomatedFieldPhenomics/raspberry-pi-zero-w-image/releases/latest/download/raspberry-pi-zero-w.img.zip) (larger, but more widely supported)
 -  [raspberry-pi-zero-w.img.xz](https://github.com/AutomatedFieldPhenomics/raspberry-pi-zero-w-image/releases/latest/download/raspberry-pi-zero-w.img.xz) (smaller, but likely requires linux)
-
-After downloading, uncompress the image.
 
 ## Installation
 
