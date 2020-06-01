@@ -69,6 +69,9 @@ cp /var/www/html/config/dnsmasq.conf /etc/dnsmasq.d/090_raspap.conf
 cp /var/www/html/config/dhcpcd.conf /etc/dhcpcd.conf
 cp /var/www/html/config/config.php /var/www/html/includes/
 
+# Change WPA password
+sed -i "s|wpa_passphrase=ChangeMe|wpa_passphrase=raspberry|g' /etc/hostapd/hostapd.conf
+
 systemctl disable systemd-networkd
 cp /var/www/html/config/raspap-bridge-br0.netdev /etc/systemd/network/raspap-bridge-br0.netdev
 cp /var/www/html/config/raspap-br0-member-eth0.network /etc/systemd/network/raspap-br0-member-eth0.network
