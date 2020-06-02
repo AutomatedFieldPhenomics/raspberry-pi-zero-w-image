@@ -72,10 +72,21 @@ cp /var/www/html/config/config.php /var/www/html/includes/
 # Change WPA password
 sed -i "s|wpa_passphrase=ChangeMe|wpa_passphrase=raspberry|g" /etc/hostapd/hostapd.conf
 
+# Change AP interface
+sed -i "s|interface=wlan0|interface=uap0|g" /etc/hostapd/hostapd.conf
+
+# Setup bridge network
 systemctl disable systemd-networkd
 cp /var/www/html/config/raspap-bridge-br0.netdev /etc/systemd/network/raspap-bridge-br0.netdev
 cp /var/www/html/config/raspap-br0-member-eth0.network /etc/systemd/network/raspap-br0-member-eth0.network
 
+# Add Raspberry Pi Zero W AP-STA mode
+cat << EOF > /etc/raspap/hostapd.ini
+LogEnable = 1
+WifiAPEnable = 1
+BridgedEnable = 0
+WifiManaged = wlan0
+EOF
 
 echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/90_raspap.conf
 
