@@ -8,3 +8,4 @@ IFS=$'\n\t'
 # Create link
 echo "America/Winnipeg" > /etc/timezone
 ln -sf /usr/share/zoneinfo/America/Winnipeg /etc/localtime
+dpkg-reconfigure -f noninteractive tzdata
