@@ -8,6 +8,19 @@ IFS=$'\n\t'
 # Allow empty sets
 shopt -s nullglob
 
+# Parse options
+pause=0
+while getopts ":p" opt; do
+  case ${opt} in
+    p )
+      pause=1
+      ;;
+    \? ) echo "Usage: create-image [-p]"
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
 # Ensure we are root
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root" 1>&2
@@ -100,6 +113,12 @@ for script in scripts.d/* ; do
     chroot "${mount}" "/tmp/`basename ${script}`"
     rm -f "${mount}/tmp/${script}"
 done
+
+# Pause
+if [ "$pause" = 1 ] ; then
+    echo "Pausing... press ENTER to continue."
+    read
+fi
 
 # Copy original resolv.conf
 mv -f ${mount}/etc/resolv.conf.bak ${mount}/etc/resolv.conf
