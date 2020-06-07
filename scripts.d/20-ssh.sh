@@ -5,7 +5,8 @@ set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
-# Create link
-echo "America/Winnipeg" > /etc/timezone
-ln -sf /usr/share/zoneinfo/America/Winnipeg /etc/localtime
-dpkg-reconfigure -f noninteractive tzdata
+# Enable ssh server
+update-rc.d ssh enable
+
+# Disable password authentication
+sed -i 's/\#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config

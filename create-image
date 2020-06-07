@@ -8,6 +8,19 @@ IFS=$'\n\t'
 # Allow empty sets
 shopt -s nullglob
 
+# Parse options
+pause=0
+while getopts ":p" opt; do
+  case ${opt} in
+    p )
+      pause=1
+      ;;
+    \? ) echo "Usage: create-image [-p]"
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
 # Ensure we are root
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root" 1>&2
@@ -17,7 +30,7 @@ fi
 # Some useful constants
 mount="mnt" # Local directory to mount the image (automatically created/delete as needed)
 rpi_zip="raspberry-pi-zero-w.zip"
-rpi_url="https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2020-02-14/2020-02-13-raspbian-buster-lite.zip"
+rpi_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-05-28/2020-05-27-raspios-buster-lite-armhf.zip"
 
 # Download raspbian zip only if we have not already done so
 rpi_orig_zip="${rpi_zip/.zip/.orig.zip}"
@@ -35,6 +48,7 @@ unmount() {
     if [[ ! -f "${mount}/.gitignore" ]]; then
         umount "${mount}/dev/pts" || true
         umount "${mount}/dev"  || true
+        umount "${mount}/tmp"  || true
         umount "${mount}/sys"  || true
         umount "${mount}/proc" || true
         umount "${mount}/boot" || true
@@ -71,6 +85,7 @@ mount "${bootdev}" "${mount}/boot"
 # Prep the chroot
 mount -t proc  none ${mount}/proc
 mount -t sysfs none ${mount}/sys
+mount -o bind  /tmp ${mount}/tmp
 mount -o bind  /dev ${mount}/dev
 mount -t devpts none ${mount}/dev/pts
 
@@ -100,6 +115,12 @@ for script in scripts.d/* ; do
     chroot "${mount}" "/tmp/`basename ${script}`"
     rm -f "${mount}/tmp/${script}"
 done
+
+# Pause
+if [ "$pause" = 1 ] ; then
+    echo "Pausing... press ENTER to continue."
+    read
+fi
 
 # Copy original resolv.conf
 mv -f ${mount}/etc/resolv.conf.bak ${mount}/etc/resolv.conf
