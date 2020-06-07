@@ -9,4 +9,4 @@ IFS=$'\n\t'
 update-rc.d ssh enable
 
 # Disable password authentication
-sed -i 's/\#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/\#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
