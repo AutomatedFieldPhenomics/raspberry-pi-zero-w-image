@@ -48,6 +48,7 @@ unmount() {
     if [[ ! -f "${mount}/.gitignore" ]]; then
         umount "${mount}/dev/pts" || true
         umount "${mount}/dev"  || true
+        umount "${mount}/tmp"  || true
         umount "${mount}/sys"  || true
         umount "${mount}/proc" || true
         umount "${mount}/boot" || true
@@ -84,6 +85,7 @@ mount "${bootdev}" "${mount}/boot"
 # Prep the chroot
 mount -t proc  none ${mount}/proc
 mount -t sysfs none ${mount}/sys
+mount -o bind  /tmp ${mount}/tmp
 mount -o bind  /dev ${mount}/dev
 mount -t devpts none ${mount}/dev/pts
 
