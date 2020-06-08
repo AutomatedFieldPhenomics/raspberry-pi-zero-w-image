@@ -131,6 +131,9 @@ mv -f ${mount}/etc/ld.so.preload.bak ${mount}/etc/ld.so.preload
 # Remove qemu
 rm -f ${mount}/usr/bin/qemu-arm-static
 
+# Change ownership on /home/pi
+chown -R pi:pi /home/pi
+
 # General cleanup
 unmount
 
