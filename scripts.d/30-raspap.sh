@@ -79,9 +79,8 @@ bogus-priv                      # Never forward addresses in the non-routed addr
 dhcp-range=192.168.50.50,192.168.50.150,12h
 EOF
 
+# Change WPA password, AP interface
 sed -i "s|wpa_passphrase=ChangeMe|wpa_passphrase=raspberry|g" /etc/hostapd/hostapd.conf
-
-# Change AP interface
 sed -i "s|interface=wlan0|interface=uap0|g" /etc/hostapd/hostapd.conf
 
 # Setup bridge network
