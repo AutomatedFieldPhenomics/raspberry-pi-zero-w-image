@@ -6,7 +6,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
 # Install packages
-sudo apt-get install libmicrohttpd-dev
+sudo apt-get install -y libmicrohttpd-dev
 
 # Install nodogsplash
 cd /usr/local/src
