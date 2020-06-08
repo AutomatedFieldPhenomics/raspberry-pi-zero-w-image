@@ -98,6 +98,8 @@ EOF
 
 echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/90_raspap.conf
 
+ln -s /usr/share/dhcpcd/hooks/10-wpa_supplicant /etc/dhcp/dhclient-enter-hooks.d/
+
 # Set firewall rules
 #iptables -t nat -A POSTROUTING -j MASQUERADE
 #iptables -t nat -A POSTROUTING -s 192.168.50.0/24 ! -d 192.168.50.0/24 -j MASQUERADE
