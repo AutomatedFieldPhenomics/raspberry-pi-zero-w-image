@@ -65,11 +65,20 @@ systemctl enable raspapd.service
 mv /etc/default/hostapd /etc/default_hostapd.old
 cp /var/www/html/config/default_hostapd /etc/default/hostapd
 cp /var/www/html/config/hostapd.conf /etc/hostapd/hostapd.conf
-cp /var/www/html/config/dnsmasq.conf /etc/dnsmasq.d/090_raspap.conf
 cp /var/www/html/config/dhcpcd.conf /etc/dhcpcd.conf
 cp /var/www/html/config/config.php /var/www/html/includes/
 
-# Change WPA password
+# dnsmasq Domain Name System aaching and Dynamic Host Configuration Protocol server
+cat << EOF > /etc/dnsmasq.d/090_raspap.conf
+# RaspAP uap0 configuration for wireless client AP mode
+interface=lo,uap0               # Use interfaces lo and uap0
+bind-interfaces                 # Bind to the interfaces
+server=8.8.8.8                  # Forward DNS requests to Google DNS
+domain-needed                   # Don't forward short names
+bogus-priv                      # Never forward addresses in the non-routed address spaces
+dhcp-range=192.168.50.50,192.168.50.150,12h
+EOF
+
 sed -i "s|wpa_passphrase=ChangeMe|wpa_passphrase=raspberry|g" /etc/hostapd/hostapd.conf
 
 # Change AP interface
