@@ -91,7 +91,7 @@ mount -t devpts none ${mount}/dev/pts
 
 # Copy distribution files
 for dir in boot etc home ; do
-    cp -f -r ${dir} ${mount}/${dir}
+    cp -f -r ${dir} ${mount}/
 done
 
 # Apply patch files
