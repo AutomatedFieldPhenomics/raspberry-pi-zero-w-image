@@ -24,9 +24,7 @@ make install
 sed -i 's|GatewayInterface br-lan|GatewayInterface uap0|' /etc/nodogsplash/nodogsplash.conf
 sed -i 's|use_outdated_mhd 0|use_outdated_mhd 1|' /etc/nodogsplash/nodogsplash.conf
 
-echo "Press ENTER to continue..."
-read
-
 # Install system service
 cp /usr/local/src/nodogsplash/debian/nodogsplash.service /lib/systemd/system/
+systemctl dameon-reload
 systemctl enable nodogsplash.service
