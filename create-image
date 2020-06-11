@@ -46,6 +46,7 @@ mv -f *.img "${rpi_img}"
 # general cleanup
 unmount() {
     if [[ ! -f "${mount}/.gitignore" ]]; then
+        df -h "${mount}/boot" "${mount}"
         umount "${mount}/dev/pts" || true
         umount "${mount}/dev"  || true
         umount "${mount}/tmp"  || true
