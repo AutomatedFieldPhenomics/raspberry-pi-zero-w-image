@@ -7,16 +7,55 @@ IFS=$'\n\t'
 
 # Based on instructions at https://github.com/billz/raspap-webgui/wiki/Manual-installation
 
-# Install prerequisites
-apt-get install -y lighttpd git hostapd dnsmasq openvpn vnstat qrencode php-cgi
-# Install iptables-persistent in non-interactive mode
+# 1. Install lighttpd
+apt-get install -y lighttpd php-cgi
+# Enable php fastcgi module
+lighttpd-enable-mod fastcgi-php
+# Enable service
+systemctl enable lighttpd.service
+
+# 2. Install iptables-persistent in non-interactive mode
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 apt-get install -y iptables-persistent
+# Set firewall rules
+cat << EOF > /etc/iptables/rules.v4
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-A POSTROUTING -j MASQUERADE
+-A POSTROUTING -s 192.168.50.0/24 ! -d 192.168.50.0/24 -j MASQUERADE
+COMMIT
+EOF
+# Forwarding rules
+echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/90_raspap.conf
 
-# Enable PHP for lighttpd
-lighttpd-enable-mod fastcgi-php
-systemctl enable lighttpd.service
+# 3. Install dnsmasq
+apt-get install -y dnsmasq
+# Create config file
+cat << EOF > /etc/dnsmasq.d/090_raspap.conf
+# RaspAP uap0 configuration for wireless client AP mode
+interface=uap0                  # Use interface uap0
+bind-interfaces                 # Bind to the interfaces
+server=8.8.8.8                  # Forward DNS requests to Google DNS
+domain-needed                   # Don't forward short names
+bogus-priv                      # Never forward addresses in the non-routed address spaces
+dhcp-range=192.168.50.50,192.168.50.150,12h
+EOF
+# Disable service
+systemctl disable dnsmasq.service
+
+# 4. Install RaspAP
+
+# Install prerequisites
+apt-get install -y git vnstat qrencode
 
 # Prepare web destination
 rm -rf /var/www/html
@@ -26,16 +65,14 @@ git clone https://github.com/billz/raspap-webgui /var/www/html
 cp /var/www/html/installers/raspap.sudoers /etc/sudoers.d/090_raspap
 
 # Create configuration directories
-mkdir /etc/raspap/
-mkdir /etc/raspap/backups
-mkdir /etc/raspap/networking
-mkdir /etc/raspap/hostapd
-mkdir /etc/raspap/lighttpd
-mkdir /etc/raspap/openvpn
+mkdir -p /etc/raspap/backups
+mkdir -p /etc/raspap/networking
+mkdir -p /etc/raspap/hostapd
+mkdir -p /etc/raspap/lighttpd
+mkdir -p /etc/raspap/openvpn
 
-# dhcpcd.conf as a base config
-cat /etc/dhcpcd.conf | tee -a /etc/raspap/networking/defaults > /dev/null
-
+# Hostapd
+apt-get install -y hostapd
 # Auth control file
 cp /var/www/html/raspap.php /etc/raspap
 # Change the default password (escape $ characters)
@@ -57,36 +94,41 @@ chmod 750 /etc/raspap/hostapd/*.sh
 # Lighttpd control scripts
 cp /var/www/html/installers/configport.sh /etc/raspap/lighttpd
 chown -c root:www-data /etc/raspap/lighttpd/*.sh
+chmod 750 /etc/raspap/lighttpd/*.sh
 
 # Raspapd daemon
 mv /var/www/html/installers/raspapd.service /lib/systemd/system
 systemctl enable raspapd.service
 
-mv /etc/default/hostapd /etc/default_hostapd.old
-cp /var/www/html/config/default_hostapd /etc/default/hostapd
-cp /var/www/html/config/hostapd.conf /etc/hostapd/hostapd.conf
+# Copy configuration files
 cp /var/www/html/config/dhcpcd.conf /etc/dhcpcd.conf
 cp /var/www/html/config/config.php /var/www/html/includes/
 
-# dnsmasq Domain Name System aaching and Dynamic Host Configuration Protocol server
-cat << EOF > /etc/dnsmasq.d/090_raspap.conf
-# RaspAP uap0 configuration for wireless client AP mode
-interface=lo,uap0               # Use interfaces lo and uap0
-bind-interfaces                 # Bind to the interfaces
-server=8.8.8.8                  # Forward DNS requests to Google DNS
-domain-needed                   # Don't forward short names
-bogus-priv                      # Never forward addresses in the non-routed address spaces
-dhcp-range=192.168.50.50,192.168.50.150,12h
+# Settings for hostapd
+cat << EOF > /etc/default/hostapd
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+#DAEMON_OPTS=""
+EOF
+#
+cat << EOF > /etc/hostapd/hostapd.conf
+driver=nl80211
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
+beacon_int=100
+auth_algs=1
+wpa_key_mgmt=WPA-PSK
+ssid=raspi-webgui
+channel=1
+hw_mode=g
+wpa_passphrase=raspberry
+interface=uap0
+wpa=2
+wpa_pairwise=CCMP
+country_code=CA
 EOF
 
-# Change WPA password, AP interface
-sed -i "s|wpa_passphrase=ChangeMe|wpa_passphrase=raspberry|g" /etc/hostapd/hostapd.conf
-sed -i "s|interface=wlan0|interface=uap0|g" /etc/hostapd/hostapd.conf
-
-# Setup bridge network
+# Disable networkd
 systemctl disable systemd-networkd
-cp /var/www/html/config/raspap-bridge-br0.netdev /etc/systemd/network/raspap-bridge-br0.netdev
-cp /var/www/html/config/raspap-br0-member-eth0.network /etc/systemd/network/raspap-br0-member-eth0.network
 
 # Add Raspberry Pi Zero W AP-STA mode
 cat << EOF > /etc/raspap/hostapd.ini
@@ -96,23 +138,69 @@ BridgedEnable = 0
 WifiManaged = wlan0
 EOF
 
-echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/90_raspap.conf
-
+# Hook for wpa_supplicant without interface matching
 ln -s /usr/share/dhcpcd/hooks/10-wpa_supplicant /etc/dhcp/dhclient-enter-hooks.d/
 
-# Set firewall rules
-#iptables -t nat -A POSTROUTING -j MASQUERADE
-#iptables -t nat -A POSTROUTING -s 192.168.50.0/24 ! -d 192.168.50.0/24 -j MASQUERADE
-#iptables-save | tee /etc/iptables/rules.v4
+cat << EOF > /etc/dhcpcd.conf
+# Defaults from Raspberry Pi configuration
+hostname
+clientid
+persistent
+option rapid_commit
+option domain_name_servers, domain_name, domain_search, host_name
+option classless_static_routes
+option ntp_servers
+require dhcp_server_identifier
+slaac private
+nohook lookup-hostname
 
-# Enable hostapd service
+# RaspAP uap0 configuration
+interface uap0
+static ip_address=192.168.50.1/24
+nohook wpa_supplicant
+EOF
+# dhcpcd.conf as a base config
+cp /etc/dhcpcd.conf /etc/raspap/networking/defaults
+
+# Add wlan0 as networking interface
+cat << EOF > /etc/raspap/networking/wlan0.ini
+interface = wlan0
+routers =
+ip_address = /INF
+domain_name_server =
+static = false
+failover = false
+EOF
+
+# Disable hostapd service (let raspap handle this)
 systemctl unmask hostapd.service
-systemctl enable hostapd.service
+systemctl disable hostapd.service
 
-# Enable openvpn client
-sed -i "s/\('RASPI_OPENVPN_ENABLED', \)false/\1true/g" /var/www/html/includes/config.php
-systemctl enable openvpn-client@client
-
+# Install openvpn
+apt-get install -y openvpn
+# Enable in raspap
+#sed -i "s/\('RASPI_OPENVPN_ENABLED', \)false/\1true/g" /var/www/html/includes/config.php
+# Setup openvpn scripts
+mkdir -p /etc/raspap/openvpn
 cp /var/www/html/installers/configauth.sh /etc/raspap/openvpn/
 chown -c root:www-data /etc/raspap/openvpn/*.sh
 chmod 750 /etc/raspap/openvpn/*.sh
+# Disable openvpn client (let raspap handle this)
+systemctl disable openvpn-client@client
+
+# Change servicestart.sh
+sed -i '/\# Start services/,$d' /etc/raspap/hostapd/servicestart.sh
+cat << EOF >> /etc/raspap/hostapd/servicestart.sh
+# Start services, mitigating race conditions
+echo "Starting network services..."
+systemctl start dhcpcd.service
+sleep "\${seconds}"
+systemctl start hostapd.service
+sleep "\${seconds}"
+systemctl start dnsmasq.service
+sleep "\${seconds}"
+if [ \$OPENVPNENABLED -eq 1 ]; then
+    systemctl start openvpn-client@client
+fi
+echo "RaspAP service start DONE"
+EOF
