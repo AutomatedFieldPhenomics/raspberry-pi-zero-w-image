@@ -71,8 +71,8 @@ parted --script "${loopdev}" print
 bootdev=$(ls "${loopdev}"*1)
 rootdev=$(ls "${loopdev}"*2)
 
-# Expand image to 4 GiB
-truncate -s 4G "${rpi_img}"
+# Expand image to 2 GiB
+truncate -s 3G "${rpi_img}"
 losetup -c "${loopdev}"
 parted --script "${loopdev}" resizepart 2 100%
 resize2fs "${rootdev}"
