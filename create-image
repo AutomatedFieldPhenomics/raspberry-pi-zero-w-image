@@ -46,6 +46,7 @@ mv -f *.img "${rpi_img}"
 # general cleanup
 unmount() {
     if [[ ! -f "${mount}/.gitignore" ]]; then
+        df -h "${mount}/boot" "${mount}"
         umount "${mount}/dev/pts" || true
         umount "${mount}/dev"  || true
         umount "${mount}/tmp"  || true
@@ -70,8 +71,8 @@ parted --script "${loopdev}" print
 bootdev=$(ls "${loopdev}"*1)
 rootdev=$(ls "${loopdev}"*2)
 
-# Expand image to 4 GiB
-truncate -s 4G "${rpi_img}"
+# Expand image to 2 GiB
+truncate -s 3G "${rpi_img}"
 losetup -c "${loopdev}"
 parted --script "${loopdev}" resizepart 2 100%
 resize2fs "${rootdev}"
@@ -91,7 +92,7 @@ mount -t devpts none ${mount}/dev/pts
 
 # Copy distribution files
 for dir in boot etc home ; do
-    cp -f -r ${dir} ${mount}/${dir}
+    cp -f -r ${dir} ${mount}/
 done
 
 # Apply patch files
