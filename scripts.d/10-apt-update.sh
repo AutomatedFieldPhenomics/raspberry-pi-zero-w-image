@@ -9,4 +9,4 @@ IFS=$'\n\t'
 apt-get update && apt-get -y -q dist-upgrade && apt-get clean
 
 # Autoremove
-apt-get autoremove
+apt-get -y autoremove
