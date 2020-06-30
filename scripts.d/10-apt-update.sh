@@ -8,3 +8,5 @@ IFS=$'\n\t'
 # Update system
 apt-get update && apt-get -y -q dist-upgrade && apt-get clean
 
+# Autoremove
+apt-get autoremove
