@@ -5,5 +5,8 @@ set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
-# Use rpi-update to update (catch pipefail will test)
-yes | rpi-update || test $? -eq 141
+# Changes dtoverlay in config.txt
+echo "dtoverlay=dwc2" >> /boot/config.txt
+
+# Adds parameter after rootwait in cmdline.txt
+sed -i "s/\(rootwait\)/ \1 modules-load=dwc2,g_ether/" /boot/cmdline.txt
