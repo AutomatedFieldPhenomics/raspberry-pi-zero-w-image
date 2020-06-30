@@ -10,3 +10,6 @@ apt-get update && apt-get -y -q dist-upgrade && apt-get clean
 
 # Autoremove
 apt-get -y autoremove
+
+# Fix any errors
+apt-get update --fix-missing -y
