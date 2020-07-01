@@ -6,7 +6,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
 # Install desktop environment
-sudo apt install -y lxde-core
+sudo apt install -y lxqt
 
 # Install tools
-apt install -y lxterminal network-manager nm-tray
+apt install -y network-manager nm-tray
