@@ -8,9 +8,25 @@ IFS=$'\n\t'
 # Install VNC
 apt install -y tightvncserver
 
-# Enable VNC
-systemctl enable vncserver-x11-serviced.service 
+# Create startup file
+cat > /etc/systemd/system/tightvncserver.service << EOF
+[Unit]
+Description=TightVNC remote desktop server
+After=sshd.service
 
-# Start VNC server at boot
-sed -i '/^# Print/i vncserver' /etc/rc.local
+[Service]
+Type=dbus
+ExecStart=/usr/bin/tightvncserver :1
+User=pi
+Type=forking
 
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Change ownership of and make executable the startup file
+chown root:root /etc/systemd/system/tightvncserver.service
+chmod 755 /etc/systemd/system/tightvncserver.service
+
+# Enable startup at boot
+systemctl enable tightvncserver.service
