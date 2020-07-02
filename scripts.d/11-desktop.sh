@@ -6,7 +6,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
 # Install desktop environment
-sudo apt install -y xfce4 xfce4-terminal
+sudo apt install -y xfce4
 
 # Install tools
 apt install -y network-manager nm-tray
