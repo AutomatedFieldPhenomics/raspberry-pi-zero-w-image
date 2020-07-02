@@ -9,4 +9,4 @@ IFS=$'\n\t'
 sudo apt install -y xfce4
 
 # Install tools
-apt install -y network-manager nm-tray
+apt install -y wicd
