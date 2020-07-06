@@ -8,6 +8,9 @@ IFS=$'\n\t'
 # Install VNC
 apt install -y realvnc-vnc-server
 
+# Start VNC at boot
+(crontab -l 2>/dev/null; echo "@reboot vncserver") | crontab -
+
 # Create startup file
 #cat > /etc/systemd/system/tightvncserver.service << EOF
 #[Unit]
