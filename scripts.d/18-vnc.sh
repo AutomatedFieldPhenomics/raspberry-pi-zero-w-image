@@ -9,27 +9,4 @@ IFS=$'\n\t'
 apt install -y realvnc-vnc-server
 
 # Start VNC at boot
-(crontab -l 2>/dev/null; echo "@reboot vncserver") | crontab -
 
-# Create startup file
-#cat > /etc/systemd/system/tightvncserver.service << EOF
-#[Unit]
-#Description=TightVNC remote desktop server
-#After=sshd.service
-
-#[Service]
-#Type=dbus
-#ExecStart=/usr/bin/tightvncserver :1
-#User=pi
-#Type=forking
-
-#[Install]
-#WantedBy=multi-user.target
-#EOF
-
-# Change ownership of and make executable the startup file
-#chown root:root /etc/systemd/system/tightvncserver.service
-#chmod 755 /etc/systemd/system/tightvncserver.service
-
-# Enable startup at boot
-#systemctl enable tightvncserver.service
