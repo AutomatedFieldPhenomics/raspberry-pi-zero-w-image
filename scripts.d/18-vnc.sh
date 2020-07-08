@@ -12,3 +12,6 @@ apt install -y tightvncserver
 mkdir /home/pi/.vnc
 echo "QuITDtCULk8=" | base64 --decode > /home/pi/.vnc/passwd
 chmod 600 /home/pi/.vnc/passwd
+
+# Reconfigure fonts
+dpkg-reconfigure xfonts-base
