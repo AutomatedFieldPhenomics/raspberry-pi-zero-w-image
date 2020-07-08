@@ -6,7 +6,8 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
 # Install VNC
-apt install -y realvnc-vnc-server
+apt install -y tightvncserver
 
-# Start VNC at boot
-
+# Set password
+mkdir /home/pi/.vnc
+echo "QuITDtCULk8=" | base64 --decode > /home/pi/.vnc/passwd
