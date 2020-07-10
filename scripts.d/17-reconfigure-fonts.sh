@@ -18,3 +18,7 @@ ExecStart=/usr/sbin/dpkg-reconfigure xfonts-base
 [Install]
 WantedBy=multi-user.target
 EOF
+
+# Enable service
+systemctl daemon-reload
+systemctl enable reconfigure.service
