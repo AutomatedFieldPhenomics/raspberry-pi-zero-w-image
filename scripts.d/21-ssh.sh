@@ -6,10 +6,10 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
 # Enable ssh server
-update-rc.d ssh enable
+touch /boot/ssh
 
 # Disable password authentication
-sed -i 's/\#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+#sed -i 's/\#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
 # Add public keys
 mkdir -p /home/pi/.ssh

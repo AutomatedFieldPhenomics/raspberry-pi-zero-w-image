@@ -5,11 +5,8 @@ set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
-# Update system
-apt-get update && apt-get -y -q dist-upgrade && apt-get clean
+# Changes dtoverlay in config.txt
+echo "dtoverlay=dwc2" >> /boot/config.txt
 
-# Autoremove
-apt-get -y autoremove
-
-# Fix any errors
-apt-get update --fix-missing -y
+# Adds parameter after rootwait in cmdline.txt
+sed -i "s/\(rootwait\)/ \1 modules-load=dwc2,g_ether/" /boot/cmdline.txt

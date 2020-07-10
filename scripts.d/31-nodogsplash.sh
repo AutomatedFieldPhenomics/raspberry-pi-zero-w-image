@@ -1,5 +1,5 @@
 #!/bin/bash
-
+<<COMMENT
 # Setup script error handling see https://disconnected.systems/blog/another-bash-strict-mode for details
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -28,3 +28,4 @@ sed -i 's|use_outdated_mhd 0|use_outdated_mhd 1|' /etc/nodogsplash/nodogsplash.c
 cp /usr/local/src/nodogsplash/debian/nodogsplash.service /lib/systemd/system/
 systemctl daemon-reload
 systemctl enable nodogsplash.service
+COMMENT

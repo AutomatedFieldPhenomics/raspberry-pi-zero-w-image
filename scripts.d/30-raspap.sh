@@ -1,5 +1,5 @@
 #!/bin/bash
-
+<<COMMENT
 # Setup script error handling see https://disconnected.systems/blog/another-bash-strict-mode for details
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -153,7 +153,6 @@ option ntp_servers
 require dhcp_server_identifier
 slaac private
 nohook lookup-hostname
-
 # RaspAP uap0 configuration
 interface uap0
 static ip_address=192.168.50.1/24
@@ -204,3 +203,4 @@ if [ \$OPENVPNENABLED -eq 1 ]; then
 fi
 echo "RaspAP service start DONE"
 EOF
+COMMENT

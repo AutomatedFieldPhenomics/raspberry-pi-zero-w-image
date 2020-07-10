@@ -5,11 +5,8 @@ set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
-# Update system
-apt-get update && apt-get -y -q dist-upgrade && apt-get clean
+# Install desktop environment
+sudo apt install -y xfce4
 
-# Autoremove
-apt-get -y autoremove
-
-# Fix any errors
-apt-get update --fix-missing -y
+# Install tools
+apt install -y wicd
