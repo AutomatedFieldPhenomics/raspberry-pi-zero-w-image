@@ -13,9 +13,6 @@ mkdir /home/pi/.vnc
 echo "QuITDtCULk8=" | base64 --decode > /home/pi/.vnc/passwd
 chmod 600 /home/pi/.vnc/passwd
 
-# Reconfigure fonts on boot (fixes font error when using tightVNC)
-sed -i '/exit 0/i dpkg-reconfigure xfonts-base' /etc/rc.local
-
 # Create service file for tightVNC see https://gist.github.com/spinxz/1692ff042a7cfd17583b
 cat > /etc/systemd/system/vncserver.service << EOF
 [Unit]
