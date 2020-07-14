@@ -10,4 +10,5 @@ apt-get install -q -y python3-pip
 
 # Python packages
 pip3 install picamera
-
+pip3 install python-tsl2591
+pip3 install adafruit-DHT
