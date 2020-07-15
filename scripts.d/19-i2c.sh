@@ -9,4 +9,4 @@ IFS=$'\n\t'
 apt-get install -y python-smbus
 
 # Enable i2c interface
-
+sed -i '/^#.*i2c/s/^#//' /boot/config.txt
