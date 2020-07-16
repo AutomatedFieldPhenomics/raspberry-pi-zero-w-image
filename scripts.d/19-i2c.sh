@@ -6,7 +6,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
 # Install neccessary packages
-apt-get install -y python-smbus libi2c-tools
+apt-get install -y python-smbus libi2c-dev
 
 # Enable i2c interface
 sed -i '/^#.*i2c/s/^#//' /boot/config.txt
