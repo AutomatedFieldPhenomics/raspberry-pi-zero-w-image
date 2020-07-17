@@ -18,6 +18,7 @@ Description=Get updated scripts from GitHub
 
 [Service]
 Type=simple
+User=pi
 ExecStart=/home/pi/updateScripts.sh
 EOF
 
