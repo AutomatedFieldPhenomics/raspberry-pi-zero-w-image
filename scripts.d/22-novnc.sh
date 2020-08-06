@@ -8,22 +8,12 @@ IFS=$'\n\t'
 # Install noVNC and dependencies
 apt install novnc websockify python-numpy -y
 
-# Create service file for noVNC
-cat > /etc/systemd/system/novnc.service << EOF
-[Unit]
-Description=VNC client web application
-After=syslog.target network.target vncserver.service
+# Create cron job to start noVNC on boot
+CRON_FILE="/var/spool/cron/pi"
 
-[Service]
-Type=forking
-User=pi
+touch $CRON_FILE
+/usr/bin/crontab $CRON_FILE
 
-ExecStart=/usr/bin/websockify -D --web=/usr/share/novnc/ 6080 localhost:5901
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable service
-systemctl daemon-reload
-systemctl enable novnc.service
+crontab -u pi -l > /tmp/crontab
+/bin/echo "@reboot websockify -D --web=/usr/share/novnc/ 6080 localhost:5901" >> /tmp/crontab
+crontab -u pi /tmp/crontab
