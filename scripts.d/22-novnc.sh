@@ -6,7 +6,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 
 # Install noVNC and dependencies
-apt install novnc websockify python-numpy
+apt install novnc websockify python-numpy -y
 
 # Create service file for noVNC
 cat > /etc/systemd/system/novnc.service << EOF
