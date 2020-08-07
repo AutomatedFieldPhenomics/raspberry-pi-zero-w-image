@@ -9,9 +9,4 @@ IFS=$'\n\t'
 apt install novnc websockify python-numpy -y
 
 # Create cron job to start noVNC on boot
-CRON_FILE="/var/spool/cron/pi"
-
-touch $CRON_FILE
-/usr/bin/crontab $CRON_FILE
-
-/bin/echo "@reboot websockify -D --web=/usr/share/novnc/ 6080 localhost:5901" >> $CRON_FILE 
+(crontab -u pi -l 2>/dev/null; echo "@reboot websockify -D --web=/usr/share/novnc/ 6080 localhost:5901") | crontab -u pi -
