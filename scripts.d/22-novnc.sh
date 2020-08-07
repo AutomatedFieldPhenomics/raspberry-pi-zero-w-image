@@ -14,5 +14,4 @@ CRON_FILE="/var/spool/cron/pi"
 touch $CRON_FILE
 /usr/bin/crontab $CRON_FILE
 
-crontab -u pi -l > /tmp/crontab
 /bin/echo "@reboot websockify -D --web=/usr/share/novnc/ 6080 localhost:5901" >> $CRON_FILE 
